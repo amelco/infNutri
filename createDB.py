@@ -29,13 +29,21 @@ def getInsert(file, tabela, tipo):
             n += 1
             elem = readList(ls[2])
             qtdelem = readList(ls[3])
-            print(elem)
-            print(qtdelem)
+            # print(elem)
+            # print(qtdelem)
             # TODO: create a third table programatically containing
             #       the elements to link ingredientes and elementos
             #       in a many-to-many relatioship.
+            temp(elem, n - 2)   # solution is this table
+            # TODO 2: Find a way to link qtdelem to this
     # print(r)
     return r
+
+
+def temp(elems, id):
+    for item in elems:
+        print(id, int(item))
+    pass
 
 
 def criaTabela(nome, colunas):
