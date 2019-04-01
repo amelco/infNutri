@@ -33,14 +33,14 @@ def getInsert(file, tabela, tipo):
             # cria tabela de intermediação
             tabIntermed = "ElemIngr"
             criaTabela(tabIntermed, "id int, idEle int, idIng int")
-            values = temp(elem, n - 2)
+            values = getValues(elem, n - 2)
             insertValues = "INSERT INTO " + tabIntermed + " values " + values
             c.execute(insertValues)
     # print(r)
     return r
 
 
-def temp(idEle, idIng):
+def getValues(idEle, idIng):
     r = "(1,"
     n = 2
     for item in idEle:
