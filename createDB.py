@@ -1,6 +1,7 @@
 import sqlite3
 from math import floor
 
+
 def readList(list):
     """Read a string of format '{1 2 3 4 5}' and returns
     an float list [1, 2, 3, 4, 5]"""
@@ -23,7 +24,7 @@ def getInsert(file, tabela, tipo):
         if tipo == 1:
             r += line + "'), (" + str(n) + ",'"
             n += 1
-        elif tipo == 2:
+        elif tipo == 2 or 3:
             ls = line.split(",")
             r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
             n += 1
@@ -31,8 +32,16 @@ def getInsert(file, tabela, tipo):
             # qtdelem = readList(ls[3])
 
             # cria tabela de intermediação
-            tabIntermed = "ElemIngr"
-            criaTabela(tabIntermed, "id int, idEle int, idIng int")
+            if tipo == 2:
+                tabIntermed = "ElemIngr"
+                criaTabela(tabIntermed, "id int, idEle int, idIng int")
+            if tipo == 3:
+                tabIntermed = "IngPao"
+                criaTabela(tabIntermed, "id int, idIng int, idPao int")
+                # colocar aqui o INSERT específico pro tipo 3
+                # que é com o peso dos ingredientes. Provavelmente os outros
+                # dois comandos abaixo serão diferentes para os tipos 2 e 3,
+                # sendo comum apenas o c.execute()
             values = getValues(elem, n - 2)
             insertValues = "INSERT INTO " + tabIntermed + " values " + values
             c.execute(insertValues)
@@ -92,6 +101,7 @@ ingFil = "ingredientes.csv"
 
 tblPao = "paes"
 paoCol = "id int PRIMARY KEY, nome char(100), peso int"
+paoFil = "paes.csv"
 
 # conn = sqlite3.connect("paes.db")    # tabela física (em arquivo)
 conn = sqlite3.connect(":memory:")   # tabela na memória (volátil)
@@ -102,9 +112,10 @@ preencheTabela(tblEle, eleFil, 1)
 # verTabela(tblEle)
 criaTabela(tblIng, ingCol)
 preencheTabela(tblIng, ingFil, 2)
-# verTabela(tblIng)
+# verTabela("ElemIngr")
 criaTabela(tblPao, paoCol)
-# preencheTabela(tblPao, paoFil, 3)
+preencheTabela(tblPao, paoFil, 3)
 listarTudo()
+# verTabela("ElemIngr")
 
 conn.close()
