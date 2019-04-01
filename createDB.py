@@ -1,5 +1,5 @@
 import sqlite3
-
+from math import floor
 
 def readList(list):
     """Read a string of format '{1 2 3 4 5}' and returns
@@ -28,22 +28,25 @@ def getInsert(file, tabela, tipo):
             r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
             n += 1
             elem = readList(ls[2])
-            qtdelem = readList(ls[3])
-            # print(elem)
-            # print(qtdelem)
-            # TODO: create a third table programatically containing
-            #       the elements to link ingredientes and elementos
-            #       in a many-to-many relatioship.
-            temp(elem, n - 2)   # solution is this table
-            # TODO 2: Find a way to link qtdelem to this
+            # qtdelem = readList(ls[3])
+
+            # cria tabela de intermediação
+            tabIntermed = "ElemIngr"
+            criaTabela(tabIntermed, "id int, idEle int, idIng int")
+            values = temp(elem, n - 2)
+            insertValues = "INSERT INTO " + tabIntermed + " values " + values
+            c.execute(insertValues)
     # print(r)
     return r
 
 
-def temp(elems, id):
-    for item in elems:
-        print(id, int(item))
-    pass
+def temp(idEle, idIng):
+    r = "(1,"
+    n = 2
+    for item in idEle:
+        r += str(floor(item)) + "," + str(idIng) + "), (" + str(n) + ","
+        n += 1
+    return r[:-4 - len(str(n))]
 
 
 def criaTabela(nome, colunas):
@@ -67,8 +70,20 @@ def verTabela(nome):
         print(r)
 
 
+def listarTudo():
+    ex = "SELECT m.name as tableName, \
+               p.name as columnName \
+        FROM sqlite_master m \
+        left outer join pragma_table_info((m.name)) p \
+             on m.name <> p.name \
+        order by tableName, columnName;"
+    res = c.execute(ex)
+    for r in res:
+        print(r)
+
+
 tblEle = "elementos"
-eleCol = "id int PRIMARY KEY, elemento char(100) NOT NULL"
+eleCol = "id int PRIMARY KEY, nome char(100) NOT NULL"
 eleFil = "elementos.csv"
 
 tblIng = "ingredientes"
@@ -76,17 +91,20 @@ ingCol = "id int PRIMARY KEY, nome char(100), peso int"
 ingFil = "ingredientes.csv"
 
 tblPao = "paes"
+paoCol = "id int PRIMARY KEY, nome char(100), peso int"
 
-# conn = sqlite3.connect("paes.db")
-conn = sqlite3.connect(":memory:")
+# conn = sqlite3.connect("paes.db")    # tabela física (em arquivo)
+conn = sqlite3.connect(":memory:")   # tabela na memória (volátil)
 c = conn.cursor()
 
 criaTabela(tblEle, eleCol)
 preencheTabela(tblEle, eleFil, 1)
-verTabela(tblEle)
-
+# verTabela(tblEle)
 criaTabela(tblIng, ingCol)
 preencheTabela(tblIng, ingFil, 2)
-verTabela(tblIng)
+# verTabela(tblIng)
+criaTabela(tblPao, paoCol)
+# preencheTabela(tblPao, paoFil, 3)
+listarTudo()
 
 conn.close()
