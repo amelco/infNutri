@@ -35,25 +35,25 @@ def getInsert(file, tabela, tipo):
             if tipo == 2:
                 tabIntermed = "ElemIngr"
                 criaTabela(tabIntermed, "id int, idEle int, idIng int")
+                values = getValues(elem, n - 2)
+                insertValues = "INSERT INTO " + tabIntermed + " values "\
+                                              + values
             if tipo == 3:
                 tabIntermed = "IngPao"
                 criaTabela(tabIntermed, "id int, idIng int, idPao int")
-                # colocar aqui o INSERT específico pro tipo 3
-                # que é com o peso dos ingredientes. Provavelmente os outros
-                # dois comandos abaixo serão diferentes para os tipos 2 e 3,
-                # sendo comum apenas o c.execute()
-            values = getValues(elem, n - 2)
-            insertValues = "INSERT INTO " + tabIntermed + " values " + values
+                values = getValues(elem, n - 2)
+                insertValues = "INSERT INTO " + tabIntermed + " values "\
+                                              + values
             c.execute(insertValues)
     # print(r)
     return r
 
 
-def getValues(idEle, idIng):
+def getValues(lista, id):
     r = "(1,"
     n = 2
-    for item in idEle:
-        r += str(floor(item)) + "," + str(idIng) + "), (" + str(n) + ","
+    for item in lista:
+        r += str(floor(item)) + "," + str(id) + "), (" + str(n) + ","
         n += 1
     return r[:-4 - len(str(n))]
 
@@ -116,6 +116,7 @@ preencheTabela(tblIng, ingFil, 2)
 criaTabela(tblPao, paoCol)
 preencheTabela(tblPao, paoFil, 3)
 listarTudo()
-# verTabela("ElemIngr")
+verTabela("ElemIngr")
+verTabela("IngPao")
 
 conn.close()
