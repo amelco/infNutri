@@ -13,14 +13,19 @@ def readList(list):
 
 def getInsert(file, tabela, tipo):
     """Lê valores separados por vírgula de um arquivo e monta o
-    INSERT INTO statement"""
+    INSERT INTO statement
+    Se a linha começar com #, é considerada comentário e não é lida"""
     r = "INSERT INTO " + tabela + " values (1,'"
     f = open(file, "r")
     n = 2
     for line in f.read().split('\n'):
+        # sai do loop caso linha seja vazia (EOF)
         if line == "":
             r = r[:-len(str(n)) - 5]
             break
+        # pula linha que comece com '#'
+        if line[0] == "#":
+            continue
         if tipo == 1:
             r += line + "'), (" + str(n) + ",'"
             n += 1
@@ -34,28 +39,28 @@ def getInsert(file, tabela, tipo):
             # cria tabela de intermediação
             if tipo == 2:
                 tabIntermed = "ElemIngr"
-                criaTabela(tabIntermed, "id int, idEle int, idIng int")
+                criaTabela(tabIntermed, "idEle int, idIng int")
                 values = getValues(elem, n - 2)
                 insertValues = "INSERT INTO " + tabIntermed + " values "\
                                               + values
             if tipo == 3:
                 tabIntermed = "IngPao"
-                criaTabela(tabIntermed, "id int, idIng int, idPao int")
+                criaTabela(tabIntermed, "idIng int, idPao int")
                 values = getValues(elem, n - 2)
                 insertValues = "INSERT INTO " + tabIntermed + " values "\
                                               + values
+            # print(insertValues)
             c.execute(insertValues)
+        print(line)
     # print(r)
     return r
 
 
 def getValues(lista, id):
-    r = "(1,"
-    n = 2
+    r = "("
     for item in lista:
-        r += str(floor(item)) + "," + str(id) + "), (" + str(n) + ","
-        n += 1
-    return r[:-4 - len(str(n))]
+        r += str(floor(item)) + "," + str(id) + "), ("
+    return r[:-3]
 
 
 def criaTabela(nome, colunas):
@@ -119,7 +124,8 @@ preencheTabela(tblPao, paoFil, 3)
 listarTudo()
 verTabela(tblEle)
 verTabela(tblIng)
-# verTabela("ElemIngr")
-# verTabela("IngPao")
+verTabela(tblPao)
+verTabela("ElemIngr")
+verTabela("IngPao")
 
 conn.close()
