@@ -31,28 +31,33 @@ def getInsert(file, tabela, tipo):
             n += 1
         elif tipo == 2 or 3:
             ls = line.split(",")
-            r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
+            # r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
             n += 1
             elem = readList(ls[2])
-            # qtdelem = readList(ls[3])
 
             # cria tabela de intermediação
             if tipo == 2:
+                r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
                 tabIntermed = "ElemIngr"
                 criaTabela(tabIntermed, "idEle int, idIng int")
                 values = getValues(elem, n - 2)
                 insertValues = "INSERT INTO " + tabIntermed + " values "\
                                               + values
             if tipo == 3:
+                qtdelem = readList(ls[3])
+                r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
                 tabIntermed = "IngPao"
-                criaTabela(tabIntermed, "idIng int, idPao int")
-                values = getValues(elem, n - 2)
+                criaTabela(tabIntermed, "idIng int, idPao int, peso int")
+                # values = getValues(elem, n - 2)
+                id = n - 2
+                values = "("
+                for i in range(0, len(elem)):
+                    values += str(floor(elem[i])) + "," + str(id) + ","\
+                                                  + str(qtdelem[i]) + "), ("
+                values = values[:-3]
                 insertValues = "INSERT INTO " + tabIntermed + " values "\
                                               + values
-            # print(insertValues)
             c.execute(insertValues)
-        print(line)
-    # print(r)
     return r
 
 
@@ -97,13 +102,12 @@ def listarTudo():
 
 
 tblEle = "elementos"
-eleCol = "idEle int NOT NULL,\
-          nome char(100) NOT NULL,\
-          PRIMARY KEY (idEle)"
+eleCol = "id int PRIMARY KEY,\
+          nome char(100) NOT NULL"
 eleFil = "elementos.csv"
 
 tblIng = "ingredientes"
-ingCol = "idIng int PRIMARY KEY, nome char(100), peso int"
+ingCol = "id int PRIMARY KEY, nome char(100), peso int"
 ingFil = "ingredientes.csv"
 
 tblPao = "paes"
@@ -121,11 +125,11 @@ preencheTabela(tblIng, ingFil, 2)
 criaTabela(tblPao, paoCol)
 preencheTabela(tblPao, paoFil, 3)
 
-listarTudo()
-verTabela(tblEle)
-verTabela(tblIng)
-verTabela(tblPao)
-verTabela("ElemIngr")
-verTabela("IngPao")
+# listarTudo()
+# verTabela(tblEle)
+# verTabela(tblIng)
+# verTabela(tblPao)
+# verTabela("ElemIngr")
+# verTabela("IngPao")
 
 conn.close()
