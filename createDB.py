@@ -92,11 +92,13 @@ def listarTudo():
 
 
 tblEle = "elementos"
-eleCol = "id int PRIMARY KEY, nome char(100) NOT NULL"
+eleCol = "idEle int NOT NULL,\
+          nome char(100) NOT NULL,\
+          PRIMARY KEY (idEle)"
 eleFil = "elementos.csv"
 
 tblIng = "ingredientes"
-ingCol = "id int PRIMARY KEY, nome char(100), peso int"
+ingCol = "idIng int PRIMARY KEY, nome char(100), peso int"
 ingFil = "ingredientes.csv"
 
 tblPao = "paes"
@@ -109,14 +111,15 @@ c = conn.cursor()
 
 criaTabela(tblEle, eleCol)
 preencheTabela(tblEle, eleFil, 1)
-# verTabela(tblEle)
 criaTabela(tblIng, ingCol)
 preencheTabela(tblIng, ingFil, 2)
-# verTabela("ElemIngr")
 criaTabela(tblPao, paoCol)
 preencheTabela(tblPao, paoFil, 3)
+
 listarTudo()
-verTabela("ElemIngr")
-verTabela("IngPao")
+verTabela(tblEle)
+verTabela(tblIng)
+# verTabela("ElemIngr")
+# verTabela("IngPao")
 
 conn.close()
