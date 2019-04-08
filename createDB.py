@@ -11,11 +11,12 @@ def readList(list):
     return fltlst
 
 
-def getInsert(file, tabela, tipo):
+def getInsert(file, tabela):
     """Lê valores separados por vírgula de um arquivo e monta o
     INSERT INTO statement
     Se a linha começar com #, é considerada comentário e não é lida"""
     r = "INSERT INTO " + tabela + " values (1,'"
+    r2 = []
     f = open(file, "r")
     n = 2
     for line in f.read().split('\n'):
@@ -26,26 +27,22 @@ def getInsert(file, tabela, tipo):
         # pula linha que comece com '#'
         if line[0] == "#":
             continue
-        if tipo == 1:
+        if tabela == "elementos":
             r += line + "'), (" + str(n) + ",'"
             n += 1
-        elif tipo == 2 or 3:
+        elif tabela == "ingredientes" or "paes":
             ls = line.split(",")
             n += 1
             elem = readList(ls[2])
 
             # cria tabela de intermediação
-            if tipo == 2:
+            if tabela == "ingredientes":
                 tabIntermed = "ElemIngr"
-                campos = "idEle int, idIng int, pesoEle int"
-            if tipo == 3:
+            if tabela == "paes":
                 tabIntermed = "IngPao"
-                campos = "idIng int, idPao int, pesoIng int"
 
             qtdelem = readList(ls[3])
             r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
-            criaTabela(tabIntermed, campos)
-            # values = getValues(elem, n - 2)
             id = n - 2
             values = "("
             for i in range(0, len(elem)):
@@ -54,90 +51,54 @@ def getInsert(file, tabela, tipo):
             values = values[:-3]
             insertValues = "INSERT INTO " + tabIntermed + " values "\
                                           + values
-            print(insertValues)
-            c.execute(insertValues)
-    # print(r)
-    return r
+            r2.append(insertValues)
+    r2.append(r)
+    return r2
 
 
-# def getValues(lista, id):
-#     r = "("
-#     for item in lista:
-#         r += str(floor(item)) + "," + str(id) + "), ("
-#     return r[:-3]
+dbName = "paes.db"
 
+# creating tables
+with sqlite3.connect(dbName) as conn:
+    c = conn.cursor()
+    querys = [
+        'CREATE TABLE elementos (\
+            id INTEGER PRIMARY KEY AUTOINCREMENT, \
+            nome TEXT NOT NULL\
+        )',
+        'CREATE TABLE ingredientes (\
+            id INTEGER PRIMARY KEY AUTOINCREMENT,\
+            nome TEXT NOT NULL,\
+            peso_ref INTEGER NOT NULL\
+        )',
+        'CREATE TABLE paes (\
+            id INTEGER PRIMARY KEY AUTOINCREMENT,\
+            nome TEXT NOT NULL,\
+            peso INTEGER NOT NULL\
+        )',
+        'CREATE TABLE ElemIngr (\
+            idEle INTEGER NOT NULL,\
+            idIng INTEGER NOT NULL,\
+            pesoEle INTEGER NOT NULL\
+        )',
+        'CREATE TABLE IngPao (\
+        idIng INTEGER NOT NULL,\
+        idPao INTEGER NOT NULL,\
+        pesoIng REAL NOT NULL\
+        )'
+    ]
+    for query in querys:
+        c.execute(query)
 
-def criaTabela(nome, colunas):
-    dropTable = "DROP TABLE IF EXISTS " + nome
-    c.execute(dropTable)
-    createTable = "CREATE TABLE " + nome + "(" + colunas + ")"
-    c.execute(createTable)
-
-
-def preencheTabela(nome, file, tipo):
-    insertValues = getInsert(file, nome, tipo)
-    c.execute(insertValues)
-    conn.commit()
-
-
-def verTabela(nome):
-    # visualiza a tabela
-    pesq = "SELECT * FROM " + nome
-    res = conn.execute(pesq)
-    for r in res:
-        print(r)
-
-
-def listarTudo():
-    """Lista todas as tabelas e suas colunas"""
-    ex = "SELECT m.name as tableName, \
-               p.name as columnName \
-        FROM sqlite_master m \
-        left outer join pragma_table_info((m.name)) p \
-             on m.name <> p.name \
-        order by tableName, columnName;"
-    res = c.execute(ex)
-    for r in res:
-        print(r)
-
-
-def createDB():
-    criaTabela(tblEle, eleCol)
-    criaTabela(tblIng, ingCol)
-    criaTabela(tblPao, paoCol)
-    preencheTabela(tblEle, eleFil, 1)
-    preencheTabela(tblIng, ingFil, 2)
-    preencheTabela(tblPao, paoFil, 3)
-
-
-name = "paes.db"
-
-tblEle = "elementos"
-eleCol = "id INTEGER PRIMARY KEY AUTOINCREMENT,\
-          nome char(100) NOT NULL"
-eleFil = "elementos.csv"
-
-tblIng = "ingredientes"
-ingCol = "id INTEGER PRIMARY KEY AUTOINCREMENT,\
-          nome char(100) NOT NULL,\
-          peso_ref INTEGER NOT NULL"
-ingFil = "ingredientes.csv"
-
-tblPao = "paes"
-paoCol = "id INTEGER PRIMARY KEY AUTOINCREMENT,\
-          nome char(100) NOT NULL,\
-          peso INTEGER NOT NULL"
-paoFil = "paes.csv"
-
-conn = sqlite3.connect(name)    # tabela física (em arquivo)
-# conn = sqlite3.connect(":memory:")   # tabela na memória (volátil)
-c = conn.cursor()
-createDB()
-# listarTudo()
-# verTabela(tblEle)
-# verTabela(tblIng)
-# verTabela(tblPao)
-# verTabela("ElemIngr")
-# verTabela("IngPao")
-conn.commit()
-conn.close()
+# populating tables
+with sqlite3.connect(dbName) as conn:
+    c = conn.cursor()
+    querys = [
+        getInsert("elementos.csv", "elementos"),
+        getInsert("ingredientes.csv", "ingredientes"),
+        getInsert("paes.csv", "paes")
+    ]
+    for query in querys:
+        for q in query:
+            print(q)
+            c.execute(q)
