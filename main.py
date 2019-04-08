@@ -19,23 +19,30 @@ pi se localiza na tabela: ingPao.pesoIng
 # conectando ao DB
 test = connect.conectar(nomeDB)
 
-# Selecionando os paes
+# Selecionando o pao
 paes = test.selectPaes()
-
-# visualizando resultados
-print(paes)
-print(paes[0]['nome'])
-print(paes[1]['nome'])
+pao = paes[0]['nome']
 
 # Selecionando o peso (quantidade dos elementos de uma lista de
 #   ingredientes de um pão específico)
 query = "SELECT idEle, pesoEle FROM ElemIngr \
          WHERE idIng IN (\
-         SELECT idIng FROM ingPao WHERE idPao == 2\
+         SELECT idIng FROM ingPao WHERE idPao IN (\
+         SELECT id FROM paes WHERE nome == '" + pao + "')\
          )"
-# query = "SELECT * FROM ingPao WHERE idPao == 2"
+qtdEle = test.execute(query)
+for ele in qtdEle:
+    print(ele)
 
-print(test.execute(query))
+# Selecionando o peso referência dos ingredientes de um pao especifico
+query = "SELECT id, peso_ref FROM ingredientes \
+         WHERE id IN (\
+         SELECT idIng FROM ingPao WHERE idPao IN (\
+         SELECT id FROM paes WHERE nome == '" + pao + "')\
+         )"
+pesoRef = test.execute(query)
+for peso in pesoRef:
+    print(peso)
 
 # desconectando do DB
 test.desconectar()
