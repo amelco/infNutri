@@ -71,18 +71,19 @@ def getValues(lista, id):
 def criaTabela(nome, colunas):
     dropTable = "DROP TABLE IF EXISTS " + nome
     c.execute(dropTable)
-
     createTable = "CREATE TABLE " + nome + "(" + colunas + ")"
     c.execute(createTable)
 
 
 def preencheTabela(nome, file, tipo):
     insertValues = getInsert(file, nome, tipo)
+    print(insertValues)
     c.execute(insertValues)
+    conn.commit()
 
 
 def verTabela(nome):
-    # testa a tabela elementos
+    # visualiza a tabela
     pesq = "SELECT * FROM " + nome
     res = conn.execute(pesq)
     for r in res:
@@ -90,6 +91,7 @@ def verTabela(nome):
 
 
 def listarTudo():
+    """Lista todas as tabelas e suas colunas"""
     ex = "SELECT m.name as tableName, \
                p.name as columnName \
         FROM sqlite_master m \
@@ -100,6 +102,17 @@ def listarTudo():
     for r in res:
         print(r)
 
+
+def createDB():
+    criaTabela(tblEle, eleCol)
+    criaTabela(tblIng, ingCol)
+    criaTabela(tblPao, paoCol)
+    preencheTabela(tblEle, eleFil, 1)
+    preencheTabela(tblIng, ingFil, 2)
+    preencheTabela(tblPao, paoFil, 3)
+
+
+name = "paes.db"
 
 tblEle = "elementos"
 eleCol = "id int PRIMARY KEY,\
@@ -114,22 +127,14 @@ tblPao = "paes"
 paoCol = "id int PRIMARY KEY, nome char(100), peso int"
 paoFil = "paes.csv"
 
-# conn = sqlite3.connect("paes.db")    # tabela física (em arquivo)
-conn = sqlite3.connect(":memory:")   # tabela na memória (volátil)
+conn = sqlite3.connect(name)    # tabela física (em arquivo)
+# conn = sqlite3.connect(":memory:")   # tabela na memória (volátil)
 c = conn.cursor()
-
-criaTabela(tblEle, eleCol)
-preencheTabela(tblEle, eleFil, 1)
-criaTabela(tblIng, ingCol)
-preencheTabela(tblIng, ingFil, 2)
-criaTabela(tblPao, paoCol)
-preencheTabela(tblPao, paoFil, 3)
-
-# listarTudo()
+createDB()
+listarTudo()
 # verTabela(tblEle)
 # verTabela(tblIng)
 # verTabela(tblPao)
-# verTabela("ElemIngr")
-# verTabela("IngPao")
-
+verTabela("ElemIngr")
+verTabela("IngPao")
 conn.close()
