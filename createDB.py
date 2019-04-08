@@ -31,49 +31,36 @@ def getInsert(file, tabela, tipo):
             n += 1
         elif tipo == 2 or 3:
             ls = line.split(",")
-            # r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
             n += 1
             elem = readList(ls[2])
 
             # cria tabela de intermediação
             if tipo == 2:
-                qtdelem = readList(ls[3])
-                r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
                 tabIntermed = "ElemIngr"
-                criaTabela(tabIntermed, "idEle int, idIng int, pesoEle int")
-                # values = getValues(elem, n - 2)
-                id = n - 2
-                values = "("
-                for i in range(0, len(elem)):
-                    values += str(floor(elem[i])) + "," + str(id) + ","\
-                                                  + str(qtdelem[i]) + "), ("
-                values = values[:-3]
-                insertValues = "INSERT INTO " + tabIntermed + " values "\
-                                              + values
             if tipo == 3:
-                qtdelem = readList(ls[3])
-                r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
                 tabIntermed = "IngPao"
-                criaTabela(tabIntermed, "idIng int, idPao int, pesoIng int")
-                # values = getValues(elem, n - 2)
-                id = n - 2
-                values = "("
-                for i in range(0, len(elem)):
-                    values += str(floor(elem[i])) + "," + str(id) + ","\
-                                                  + str(qtdelem[i]) + "), ("
-                values = values[:-3]
-                insertValues = "INSERT INTO " + tabIntermed + " values "\
-                                              + values
+            qtdelem = readList(ls[3])
+            r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
+            criaTabela(tabIntermed, "idEle int, idIng int, pesoEle int")
+            # values = getValues(elem, n - 2)
+            id = n - 2
+            values = "("
+            for i in range(0, len(elem)):
+                values += str(floor(elem[i])) + "," + str(id) + ","\
+                                              + str(qtdelem[i]) + "), ("
+            values = values[:-3]
+            insertValues = "INSERT INTO " + tabIntermed + " values "\
+                                          + values
             print(insertValues)
             c.execute(insertValues)
     return r
 
 
-def getValues(lista, id):
-    r = "("
-    for item in lista:
-        r += str(floor(item)) + "," + str(id) + "), ("
-    return r[:-3]
+# def getValues(lista, id):
+#     r = "("
+#     for item in lista:
+#         r += str(floor(item)) + "," + str(id) + "), ("
+#     return r[:-3]
 
 
 def criaTabela(nome, colunas):
