@@ -37,11 +37,14 @@ def getInsert(file, tabela, tipo):
             # cria tabela de intermediação
             if tipo == 2:
                 tabIntermed = "ElemIngr"
+                campos = "idEle int, idIng int, pesoEle int"
             if tipo == 3:
                 tabIntermed = "IngPao"
+                campos = "idIng int, idPao int, pesoIng int"
+
             qtdelem = readList(ls[3])
             r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
-            criaTabela(tabIntermed, "idEle int, idIng int, pesoEle int")
+            criaTabela(tabIntermed, campos)
             # values = getValues(elem, n - 2)
             id = n - 2
             values = "("
@@ -53,6 +56,7 @@ def getInsert(file, tabela, tipo):
                                           + values
             print(insertValues)
             c.execute(insertValues)
+    # print(r)
     return r
 
 
@@ -72,7 +76,6 @@ def criaTabela(nome, colunas):
 
 def preencheTabela(nome, file, tipo):
     insertValues = getInsert(file, nome, tipo)
-    print(insertValues)
     c.execute(insertValues)
     conn.commit()
 
@@ -110,26 +113,31 @@ def createDB():
 name = "paes.db"
 
 tblEle = "elementos"
-eleCol = "id int PRIMARY KEY,\
+eleCol = "id INTEGER PRIMARY KEY AUTOINCREMENT,\
           nome char(100) NOT NULL"
 eleFil = "elementos.csv"
 
 tblIng = "ingredientes"
-ingCol = "id int PRIMARY KEY, nome char(100), peso_ref int"
+ingCol = "id INTEGER PRIMARY KEY AUTOINCREMENT,\
+          nome char(100) NOT NULL,\
+          peso_ref INTEGER NOT NULL"
 ingFil = "ingredientes.csv"
 
 tblPao = "paes"
-paoCol = "id int PRIMARY KEY, nome char(100), peso int"
+paoCol = "id INTEGER PRIMARY KEY AUTOINCREMENT,\
+          nome char(100) NOT NULL,\
+          peso INTEGER NOT NULL"
 paoFil = "paes.csv"
 
 conn = sqlite3.connect(name)    # tabela física (em arquivo)
 # conn = sqlite3.connect(":memory:")   # tabela na memória (volátil)
 c = conn.cursor()
 createDB()
-listarTudo()
+# listarTudo()
 # verTabela(tblEle)
 # verTabela(tblIng)
 # verTabela(tblPao)
-verTabela("ElemIngr")
-verTabela("IngPao")
+# verTabela("ElemIngr")
+# verTabela("IngPao")
+conn.commit()
 conn.close()

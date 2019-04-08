@@ -1,14 +1,6 @@
 import connect
 
 nomeDB = "paes.db"
-test = connect.conectar(nomeDB)
-
-paes = test.selectPaes()
-print(paes)
-print(paes[0]['nome'])
-print(paes[1]['nome'])
-
-test.desconectar()
 
 """
 Para a composição da tabela nutricional, são necessários:
@@ -23,3 +15,27 @@ qe se localiza na tabela: ElemIngr.pesoEle
 pr se localiza na tabela: ingredientes.peso_ref
 pi se localiza na tabela: ingPao.pesoIng
 """
+
+# conectando ao DB
+test = connect.conectar(nomeDB)
+
+# Selecionando os paes
+paes = test.selectPaes()
+
+# visualizando resultados
+print(paes)
+print(paes[0]['nome'])
+print(paes[1]['nome'])
+
+# Selecionando o peso (quantidade dos elementos de uma lista de
+#   ingredientes de um pão específico)
+query = "SELECT idEle, pesoEle FROM ElemIngr \
+         WHERE idIng IN (\
+         SELECT idIng FROM ingPao WHERE idPao == 2\
+         )"
+# query = "SELECT * FROM ingPao WHERE idPao == 2"
+
+print(test.execute(query))
+
+# desconectando do DB
+test.desconectar()

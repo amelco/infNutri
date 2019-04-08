@@ -17,5 +17,11 @@ class conectar(object):
             res.append({"nome": r[1], "peso": r[2]})
         return res
 
+    def execute(self, query):
+        res = []
+        for r in self.c.execute(query):
+            res.append(r)
+        return res
+
     def desconectar(self):
         self.c.close()
