@@ -32,7 +32,6 @@ def getInsert(file, tabela):
             n += 1
         elif tabela == "ingredientes" or "paes":
             ls = line.split(",")
-            n += 1
             elem = readList(ls[2])
 
             # cria tabela de intermediação
@@ -43,6 +42,7 @@ def getInsert(file, tabela):
 
             qtdelem = readList(ls[3])
             r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
+            n += 1
             id = n - 2
             values = "("
             for i in range(0, len(elem)):
@@ -52,6 +52,7 @@ def getInsert(file, tabela):
             insertValues = "INSERT INTO " + tabIntermed + " values "\
                                           + values
             r2.append(insertValues)
+        # print(r)
     r2.append(r)
     return r2
 
@@ -81,6 +82,7 @@ with sqlite3.connect(dbName) as conn:
             idIng INTEGER NOT NULL,\
             pesoEle INTEGER NOT NULL\
         )',
+
         'CREATE TABLE IngPao (\
         idIng INTEGER NOT NULL,\
         idPao INTEGER NOT NULL,\
@@ -100,5 +102,5 @@ with sqlite3.connect(dbName) as conn:
     ]
     for query in querys:
         for q in query:
-            print(q)
+            # print(q)
             c.execute(q)
