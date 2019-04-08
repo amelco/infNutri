@@ -37,17 +37,10 @@ def getInsert(file, tabela, tipo):
 
             # cria tabela de intermediação
             if tipo == 2:
-                r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
-                tabIntermed = "ElemIngr"
-                criaTabela(tabIntermed, "idEle int, idIng int")
-                values = getValues(elem, n - 2)
-                insertValues = "INSERT INTO " + tabIntermed + " values "\
-                                              + values
-            if tipo == 3:
                 qtdelem = readList(ls[3])
                 r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
-                tabIntermed = "IngPao"
-                criaTabela(tabIntermed, "idIng int, idPao int, peso int")
+                tabIntermed = "ElemIngr"
+                criaTabela(tabIntermed, "idEle int, idIng int, pesoEle int")
                 # values = getValues(elem, n - 2)
                 id = n - 2
                 values = "("
@@ -57,6 +50,21 @@ def getInsert(file, tabela, tipo):
                 values = values[:-3]
                 insertValues = "INSERT INTO " + tabIntermed + " values "\
                                               + values
+            if tipo == 3:
+                qtdelem = readList(ls[3])
+                r += ls[0] + "'," + ls[1] + "), (" + str(n) + ",'"
+                tabIntermed = "IngPao"
+                criaTabela(tabIntermed, "idIng int, idPao int, pesoIng int")
+                # values = getValues(elem, n - 2)
+                id = n - 2
+                values = "("
+                for i in range(0, len(elem)):
+                    values += str(floor(elem[i])) + "," + str(id) + ","\
+                                                  + str(qtdelem[i]) + "), ("
+                values = values[:-3]
+                insertValues = "INSERT INTO " + tabIntermed + " values "\
+                                              + values
+            print(insertValues)
             c.execute(insertValues)
     return r
 
@@ -120,7 +128,7 @@ eleCol = "id int PRIMARY KEY,\
 eleFil = "elementos.csv"
 
 tblIng = "ingredientes"
-ingCol = "id int PRIMARY KEY, nome char(100), peso int"
+ingCol = "id int PRIMARY KEY, nome char(100), peso_ref int"
 ingFil = "ingredientes.csv"
 
 tblPao = "paes"
