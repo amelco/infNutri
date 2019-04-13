@@ -29,6 +29,8 @@ test = connect.conectar(nomeDB)
 paes = test.selectPaes()
 pao = paes[0]['nome']
 
+# TODO: verificar se asd querys estão dando o resultado esperado
+
 # Selecionando o peso (quantidade dos elementos de uma lista de
 #   ingredientes de um pão específico)
 query = "SELECT idEle, pesoEle FROM ElemIngr \
@@ -37,9 +39,10 @@ query = "SELECT idEle, pesoEle FROM ElemIngr \
          SELECT id FROM paes WHERE nome == '" + pao + "')\
          )"
 qtdEle = test.execute(query)
+qe = []
 for ele in qtdEle:
     print(ele)
-    qe = ele[1]
+    qe.append(ele[1])
 
 
 # Selecionando o peso referência dos ingredientes de um pao especifico
@@ -49,10 +52,14 @@ query = "SELECT id, peso_ref FROM ingredientes \
          SELECT id FROM paes WHERE nome == '" + pao + "')\
          )"
 pesoRef = test.execute(query)
+pr = []
 for peso in pesoRef:
     print(peso)
-    pr = peso[1]
+    pr.append(peso[1])
 
+print(qe)
+print(pr)
+print(calcQtd(qe, pr, qe))
 
 
 # desconectando do DB
